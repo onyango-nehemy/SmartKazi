@@ -62,7 +62,7 @@ const Register = () => {
       const response = await authService.register(registerData)
       setAuth(response.user, response.token)
       toast.success('Account created successfully!')
-      navigate('/dashboard')
+      navigate('/login')
     } catch (error) {
       toast.error(error.response?.data?.message || 'Registration failed. Please try again.')
     } finally {
@@ -91,9 +91,9 @@ const Register = () => {
             value={formData.fullName}
             onChange={handleChange}
             error={errors.fullName}
-            placeholder="John Doe"
+            placeholder="Your Name e.g Smith Walter"
             icon={<User size={20} />}
-          />
+          />  
 
           <Input
             label="Username"

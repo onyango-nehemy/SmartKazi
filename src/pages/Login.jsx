@@ -51,7 +51,11 @@ const Login = () => {
       const response = await authService.login(formData)
       setAuth(response.user, response.token)
       toast.success('Welcome back!')
-      navigate('/dashboard')
+      if (response.user?.role === 'ADMIN') {
+         navigate('/admin/dashboard')
+      } else {
+         navigate('/dashboard')
+      }
     } catch (error) {
       toast.error(error.response?.data?.message || 'Login failed. Please try again.')
     } finally {

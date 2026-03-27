@@ -35,10 +35,10 @@ const Sidebar = () => {
         })}
       </nav>
 
-      {/* Quick Actions */}
+      
       <div className="p-4 border-t border-gray-200 absolute bottom-0 w-full">
         <button className="w-full bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-primary-700 transition-colors">
-          + New Project
+          Super SuperVisor
         </button>
       </div>
     </aside>

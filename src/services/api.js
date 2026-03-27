@@ -3,10 +3,10 @@ import { useAuthStore } from '../store/authStore'
 import toast from 'react-hot-toast'
 
 const api = axios.create({
-  baseURL: '/api',
+  baseURL: import.meta.env.VITE_API_URL || "http://localhost:3000/api",
   headers: {
-    'Content-Type': 'application/json',
-  },
+    "Content-Type": "application/json"
+  }
 })
 
 // Request interceptor to add token
@@ -33,7 +33,7 @@ api.interceptors.response.use(
       toast.error('Session expired. Please login again.')
     } else if (error.response?.status === 403) {
       toast.error('You do not have permission to perform this action.')
-    } else if (error.response?.status >= 500) {
+    } else if  (error.response?.status >= 500) {
       toast.error('Server error. Please try again later.')
     }
     return Promise.reject(error)

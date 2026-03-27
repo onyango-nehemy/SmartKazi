@@ -30,7 +30,7 @@ const Modal = ({
   }
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto">
+    <div className="fixed inset-0 z-[9999] overflow-y-auto">
       {/* Backdrop */}
       <div 
         className="fixed inset-0 bg-black bg-opacity-50 transition-opacity"
@@ -43,7 +43,6 @@ const Modal = ({
           className={`relative bg-white rounded-lg shadow-xl ${sizes[size]} w-full mx-auto`}
           onClick={(e) => e.stopPropagation()}
         >
-          {/* Header */}
           {(title || showCloseButton) && (
             <div className="flex items-center justify-between p-6 border-b border-gray-200">
               <h3 className="text-lg font-semibold text-gray-900">{title}</h3>
@@ -57,8 +56,6 @@ const Modal = ({
               )}
             </div>
           )}
-          
-          {/* Body */}
           <div className="p-6">
             {children}
           </div>

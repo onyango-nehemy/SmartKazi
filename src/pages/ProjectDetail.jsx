@@ -1,17 +1,21 @@
 import React, { useEffect, useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
-import { ArrowLeft, Users, Calendar, Kanban, BarChart3 } from 'lucide-react'
+import { ArrowLeft, Users, Kanban, BarChart3 } from 'lucide-react'
 import { projectService } from '../services/projectService'
 import { useProjectStore } from '../store/projectStore'
+import { useAuthStore } from '../store/authStore'
 import Button from '../components/common/Button'
 import Avatar from '../components/common/Avatar'
+import AssignUsersModal from '../components/project/AssignUsersModal'
 import toast from 'react-hot-toast'
 
 const ProjectDetail = () => {
   const { id } = useParams()
   const { currentProject, setCurrentProject } = useProjectStore()
+  const { user } = useAuthStore()
   const [members, setMembers] = useState([])
   const [loading, setLoading] = useState(true)
+  const [showAssignModal, setShowAssignModal] = useState(false) // ← modal state
 
   useEffect(() => {
     loadProjectDetails()
@@ -33,6 +37,17 @@ const ProjectDetail = () => {
     }
   }
 
+  // Refresh members after modal closes
+  const handleModalClose = async () => {
+    setShowAssignModal(false)
+    try {
+      const updatedMembers = await projectService.getMembers(id)
+      setMembers(updatedMembers)
+    } catch (error) {
+      console.error('Failed to refresh members')
+    }
+  }
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -46,18 +61,22 @@ const ProjectDetail = () => {
       <div className="text-center py-12">
         <p className="text-gray-500">Project not found</p>
         <Link to="/projects">
-          <Button variant="secondary" className="mt-4">
-            Back to Projects
-          </Button>
+          <Button variant="secondary" className="mt-4">Back to Projects</Button>
         </Link>
       </div>
     )
   }
 
+  const isAdmin = user?.role === 'ADMIN'
+
   return (
     <div className="space-y-6">
+
       {/* Back Button */}
-      <Link to="/projects" className="inline-flex items-center text-gray-600 hover:text-gray-900">
+      <Link
+        to={isAdmin ? "/admin/projects" : "/projects"}
+        className="inline-flex items-center text-gray-600 hover:text-gray-900"
+      >
         <ArrowLeft size={20} className="mr-2" />
         Back to Projects
       </Link>
@@ -82,10 +101,8 @@ const ProjectDetail = () => {
             </div>
             <p className="text-gray-600 mt-2">{currentProject.description}</p>
           </div>
-          <Link to={`/projects/${id}/board`}>
-            <Button icon={<Kanban size={20} />}>
-              Open Board
-            </Button>
+          <Link to={`${isAdmin ? '/admin' : ''}/projects/${id}/board`}>
+            <Button icon={<Kanban size={20} />}>Open Board</Button>
           </Link>
         </div>
       </div>
@@ -99,7 +116,7 @@ const ProjectDetail = () => {
             </div>
             <div>
               <p className="text-sm text-gray-600">Total Tasks</p>
-              <p className="text-2xl font-bold text-gray-900">24</p>
+              <p className="text-2xl font-bold text-gray-900">{currentProject.tasks?.length || 0}</p>
             </div>
           </div>
         </div>
@@ -111,7 +128,9 @@ const ProjectDetail = () => {
             </div>
             <div>
               <p className="text-sm text-gray-600">Completed</p>
-              <p className="text-2xl font-bold text-gray-900">18</p>
+              <p className="text-2xl font-bold text-gray-900">
+                {currentProject.tasks?.filter(t => t.status === 'DONE').length || 0}
+              </p>
             </div>
           </div>
         </div>
@@ -136,22 +155,44 @@ const ProjectDetail = () => {
             <Users size={20} />
             Team Members
           </h2>
-          <Button variant="secondary" size="sm">
-            Add Member
-          </Button>
+
+          {/* ✅ Only Admin sees Assign Users button */}
+          {isAdmin && (
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={() => setShowAssignModal(true)}
+            >
+              + Assign Users
+            </Button>
+          )}
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {members.map((member) => (
-            <div key={member.id} className="flex items-center gap-3 p-3 border border-gray-200 rounded-lg">
-              <Avatar src={member.user.avatarUrl} alt={member.user.fullName} size="md" />
-              <div className="flex-1">
-                <p className="font-medium text-gray-900">{member.user.fullName}</p>
-                <p className="text-sm text-gray-600">{member.role}</p>
+        {members.length === 0 ? (
+          <div className="text-center py-8">
+            <p className="text-gray-500">No members assigned yet.</p>
+            {isAdmin && (
+              <button
+                onClick={() => setShowAssignModal(true)}
+                className="mt-3 text-primary-600 hover:text-primary-700 text-sm font-medium"
+              >
+                + Assign users to this project
+              </button>
+            )}
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {members.map((member) => (
+              <div key={member.id} className="flex items-center gap-3 p-3 border border-gray-200 rounded-lg">
+                <Avatar src={member.user?.avatarUrl} alt={member.user?.fullName} size="md" />
+                <div className="flex-1">
+                  <p className="font-medium text-gray-900">{member.user?.fullName}</p>
+                  <p className="text-sm text-gray-500">{member.user?.email}</p>
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Recent Activity */}
@@ -178,6 +219,15 @@ const ProjectDetail = () => {
           </div>
         </div>
       </div>
+
+      {/* ✅ Assign Users Modal */}
+      {showAssignModal && currentProject && (
+        <AssignUsersModal
+          project={currentProject}
+          onClose={handleModalClose}
+        />
+      )}
+
     </div>
   )
 }

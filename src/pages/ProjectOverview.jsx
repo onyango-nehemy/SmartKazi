@@ -5,7 +5,7 @@ import { useAuthStore } from '../store/authStore'
 import { projectService } from '../services/projectService'
 import api from '../services/api'
 
-const Dashboard = () => {
+const ProjectOverview = () => {
   const { user } = useAuthStore()
   const [stats, setStats] = useState({
     totalProjects: 0,
@@ -244,4 +244,4 @@ const Dashboard = () => {
   )
 }
 
-export default Dashboard
+export default ProjectOverview

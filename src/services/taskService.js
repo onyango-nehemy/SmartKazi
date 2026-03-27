@@ -16,18 +16,13 @@ export const taskService = {
     return response.data
   },
 
-  async update(id, taskData) {
-    const response = await api.put(`/tasks/${id}`, taskData)
-    return response.data
-  },
-
   async delete(id) {
     const response = await api.delete(`/tasks/${id}`)
     return response.data
   },
 
-  async updateStatus(id, status) {
-    const response = await api.patch(`/tasks/${id}/status`, { status })
+  async updateStatus(id, data) {
+    const response = await api.patch(`/tasks/${id}/status`, data)
     return response.data
   },
 
@@ -36,12 +31,7 @@ export const taskService = {
     return response.data
   },
 
-  async updatePosition(id, status, position) {
-    const response = await api.patch(`/tasks/${id}/position`, { status, position })
-    return response.data
-  },
-
-  async getComments(id) {
+ /* async getComments(id) {
     const response = await api.get(`/tasks/${id}/comments`)
     return response.data
   },
@@ -58,5 +48,5 @@ export const taskService = {
       headers: { 'Content-Type': 'multipart/form-data' }
     })
     return response.data
-  }
+  }*/
 }

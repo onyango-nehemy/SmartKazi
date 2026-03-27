@@ -11,19 +11,21 @@ export const useTaskStore = create((set) => ({
     tasks: [...state.tasks, task] 
   })),
   
+  // FIX: Use String() comparison to avoid ID type mismatches
   updateTask: (id, updatedData) => set((state) => ({
     tasks: state.tasks.map(t => 
-      t.id === id ? { ...t, ...updatedData } : t
+      String(t.id) === String(id) ? { ...t, ...updatedData } : t
     )
   })),
   
   deleteTask: (id) => set((state) => ({
-    tasks: state.tasks.filter(t => t.id !== id)
+    tasks: state.tasks.filter(t => String(t.id) !== String(id))
   })),
   
+  // FIX: Critical for Drag & Drop functionality
   moveTask: (taskId, newStatus, newPosition) => set((state) => ({
     tasks: state.tasks.map(t => 
-      t.id === taskId 
+      String(t.id) === String(taskId) 
         ? { ...t, status: newStatus, position: newPosition }
         : t
     )
