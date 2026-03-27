@@ -71,7 +71,7 @@ function App() {
           
         </Route>
 
-        {/* ✅ Admin Routes - ALL admin pages here with AdminLayout */}
+        {/* Admin Routes - ALL admin pages here with AdminLayout */}
         <Route
           path="/admin"
           element={
@@ -83,7 +83,7 @@ function App() {
           <Route path="dashboard" element={<AdminDashboard />} />
           <Route path="projects" element={<Projects />} />
           <Route path="projects/:id" element={<ProjectDetail />} />
-          
+          <Route path="projects/:id/board" element={<TaskBoard />} />
           <Route path="profile" element={<Profile />} />
           <Route path="settings" element={<Settings />} />
           <Route path="team" element={<TeamPage />} />
